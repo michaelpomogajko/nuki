@@ -1,0 +1,26 @@
+steps:
+# Build the container image
+- name: gcr.io/cloud-builders/docker
+  args: [
+    'build',
+    '-t', 'eu.gcr.io/$PROJECT_ID/nuki:latest', 
+    '--cache-from', 'eu.gcr.io/$PROJECT_ID/nuki:latest', 
+    '.'
+  ]
+# Push the container image to Container Registry
+- name: gcr.io/cloud-builders/docker
+  args: ['push', 'eu.gcr.io/$PROJECT_ID/nuki:latest']
+# Deploy container image to Cloud Run
+- name: gcr.io/cloud-builders/gcloud
+  args: [
+    'run', 'deploy', 'nuki', 
+    '--image', 'eu.gcr.io/$PROJECT_ID/nuki:latest', 
+    '--region', 'europe-west3', 
+    '--platform', 'managed',
+    '--max-instances', '1',
+    '--memory', '128Mi',
+    '--allow-unauthenticated',
+    '--min-instances', '0'
+  ]
+
+images: ['eu.gcr.io/$PROJECT_ID/nuki:latest']
